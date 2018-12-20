@@ -25,7 +25,7 @@ SECRET_KEY = 'bwwt9e&z(dkj)7ue8+7q(-r_1h#om5jc%d=6l$0k8z(=m-!z^u'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -77,8 +77,13 @@ WSGI_APPLICATION = 'aitoubiao_web.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'aitoubiao',
+        'PORT': '3306',
+        'USER': 'root',
+        'PASSWORD': 'shaoyang',
+        'HOST': 'localhost'
+
     }
 }
 
