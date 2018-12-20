@@ -10,7 +10,6 @@ class industry_information(models.Model):
     content = models.TextField()
 
     class Meta:
-        managed = False
         db_table = 'industry_information'
 
 
@@ -21,8 +20,7 @@ class Announcement(models.Model):
     content = models.TextField()
 
     class Meta:
-        managed = False
-        db_table = 'Announcement'
+        db_table = 'announcement'
 
 class User(models.Model):
     userid = models.CharField(max_length=16)
@@ -30,6 +28,8 @@ class User(models.Model):
     password = models.CharField(max_length=128)
     user_icon = models.ImageField(upload_to='icons')
 
+    class Meta:
+        db_table = 'user'
 
 
 
