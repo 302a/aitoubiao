@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'App.apps.AppConfig',
+    'aitoubiao',
+    'user'
 ]
 
 MIDDLEWARE = [
@@ -77,13 +79,38 @@ WSGI_APPLICATION = 'aitoubiao_web.wsgi.application'
 
 DATABASES = {
     'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    },
+    'db1': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'aitoubiao',
         'USER': 'root',
         'PASSWORD': 'shaoyang',
         'HOST': '192.168.101.14',
         'PORT': '3306'
+    },
+    'db2': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'user',
+        'USER': 'root',
+        'PASSWORD': 'shaoyang',
+        'HOST': '192.168.101.14',
+        'PORT': '3306'
     }
+}
+
+
+SUB_DIR = os.path.basename(os.path.dirname(__file__))
+DATABASE_ROUTERS = [
+    '{}.database_router.DatabaseAppsRouter'.format(SUB_DIR)
+]
+
+DATABASE_APPS_MAPPING = {
+        # example:
+        #'app_label':'database_name',
+        'aitoubiao': 'db1',
+        'user': 'db2',
 }
 
 

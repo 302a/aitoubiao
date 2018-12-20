@@ -11,6 +11,7 @@ class industry_information(models.Model):
 
     class Meta:
         db_table = 'industry_information'
+        app_label = 'aitoubiao'
 
 
 class Announcement(models.Model):
@@ -21,6 +22,7 @@ class Announcement(models.Model):
 
     class Meta:
         db_table = 'announcement'
+        app_label = 'aitoubiao'
 
 class User(models.Model):
     userid = models.CharField(max_length=16)
@@ -30,6 +32,7 @@ class User(models.Model):
 
     class Meta:
         db_table = 'user'
+        app_label = 'user'
 
 
 
