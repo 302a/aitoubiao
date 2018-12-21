@@ -34,6 +34,8 @@ class User(models.Model):
         db_table = 'user'
         app_label = 'user'
 
+# 评论表
+
 
 
 

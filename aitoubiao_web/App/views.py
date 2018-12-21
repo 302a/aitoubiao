@@ -13,7 +13,7 @@ def home(request):
     userid = request.session.get('userid')
     data = {}
 
-    user = User.object.filter(userid=userid)
+    user = User.objects.filter(userid=userid)
     if user.exists():
         data['status'] = '203'
         data['msg'] = '用户已登录'
@@ -36,7 +36,7 @@ def register(request):
     data = {}
 
     # 从数据库获取对应账号数据,如果有就说明用户已存在
-    user = User.object.filter(userid=userid)
+    user = User.objects.filter(userid=userid)
 
     if user.exists():
         data['status'] = '401'
@@ -65,7 +65,7 @@ def login(request):
     userid = request.POST.get('userid')
     data = {}
 
-    user = User.object.filter(userid=userid)
+    user = User.objects.filter(userid=userid)
 
     if not user.exists():
         data['status'] = '402'
@@ -104,9 +104,10 @@ def home_model(request):
         'status': '200',
         'msg': 'ok'
     }
+    info = industry_information.objects.all()
+    # data['news_info'] = info[0:12]
+    data['info'] = list(info.values())
 
-    info = industry_information.object.all()
-    data['news_info'] = info[0:12]
     return JsonResponse(data)
 
 
