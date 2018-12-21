@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^login/', views.login),
     url(r'^unlogin/', views.unlogin),
     url(r'^home_model/', views.home_model),
+    url(r'^compile_userinfo/', views.compile_userinfo)
 ]

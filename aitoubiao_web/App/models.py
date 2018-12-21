@@ -34,9 +34,15 @@ class User(models.Model):
         db_table = 'user'
         app_label = 'user'
 
-# 评论表
+class analyse_of_market(models.Model):
+        title = models.TextField()
+        date = models.CharField(max_length=256)
+        origin = models.CharField(max_length=256)
+        content = models.TextField()
 
-
+        class Meta:
+            db_table = 'analyse_of_market'
+            app_label = 'aitoubiao'
 
 
 

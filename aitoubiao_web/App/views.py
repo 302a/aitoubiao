@@ -5,6 +5,7 @@ from django.shortcuts import render
 from App.models import industry_information
 from App.models import Announcement
 from App.models import User
+from App.models import analyse_of_market
 
 # Create your views here.
 
@@ -43,16 +44,8 @@ def register(request):
         data['msg'] = '用户已存在'
 
     else:
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user_icon = request.FILES['user_icon']
-
         user = User()
         user.userid = userid
-        user.username = username
-        # 密码加密
-        user.password = secret_pwd(password)
-        user.user_icon = user_icon
 
         user.save()
 
@@ -110,8 +103,28 @@ def home_model(request):
 
     return JsonResponse(data)
 
+# 编辑用户信息
+def compile_userinfo(request):
+    username = request.POST.get('username')
+    password = request.POST.get('password')
+    user_icon = request.FILES['user_icon']
 
+    data = {}
 
+    # 获取当前用户
+    userid = request.session.get('userid')
+
+    user = User.objects.filter(userid=userid)
+    if user.exists():
+        user = user.first()
+        user.username = username
+        # 密码加密
+        user.password = secret_pwd(password)
+        user.user_icon = user_icon
+
+        user.save()
+
+    return JsonResponse(data)
 
 
 
