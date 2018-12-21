@@ -99,8 +99,15 @@ def unlogin(request):
     return JsonResponse(data)
 
 
+def home_model(request):
+    data = {
+        'status': '200',
+        'msg': 'ok'
+    }
 
-
+    info = industry_information.object.all()
+    data['news_info'] = info[0:12]
+    return JsonResponse(data)
 
 
 
