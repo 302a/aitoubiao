@@ -8,6 +8,7 @@ from App.models import Announcement
 from App.models import User
 from App.models import analyse_of_market
 from App.models import web_list
+from App.models import test
 
 
 # Create your views here.
@@ -105,9 +106,11 @@ def home_model(request):
         'msg': 'ok'
     }
     info = industry_information.objects.all()
-    # data['news_info'] = info[0:12]
     data['info'] = list(info.values())[0:12]
-    # print(list(info.values))
+
+    # info = test.objects.all()
+    # print(list(info.values()))
+    # data['info'] = list(info.values())
 
     return JsonResponse(data)
 
@@ -134,7 +137,7 @@ def compile_userinfo(request):
 
     return JsonResponse(data)
 
-def test(request):
+def tests(request):
     if request.method == 'GET':
         print('*************')
         print(request.GET.get('id'))
@@ -158,6 +161,16 @@ def test(request):
 
     return JsonResponse(data)
 
+def web_name(request):
+    data = {
+        'status': '200',
+        'msg': 'ok'
+    }
+
+    info = web_list.objects.all()
+    data['info'] = list(info.values())
+
+    return JsonResponse(data)
 
 
 

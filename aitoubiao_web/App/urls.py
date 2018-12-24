@@ -23,5 +23,7 @@ urlpatterns = [
     url(r'^unlogin/', views.unlogin),
     url(r'^home_model/', views.home_model),
     url(r'^compile_userinfo/', views.compile_userinfo),
-    url(r'^test/', views.test),
+    url(r'^tests/', views.tests),
+    url(r'^web_name/', views.web_name),
+
 ]
