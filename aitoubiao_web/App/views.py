@@ -9,6 +9,7 @@ from App.models import User
 from App.models import analyse_of_market
 from App.models import web_list
 
+
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
 
