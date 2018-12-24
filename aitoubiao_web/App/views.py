@@ -167,8 +167,19 @@ def web_name(request):
         'msg': 'ok'
     }
 
-    info = web_list.objects.all()
-    data['info'] = list(info.values())
+    info_list = web_list.objects.all()
+    web_type_list = []
+    for info in info_list:
+        if info.web_type.strip(' ') not in web_type_list:
+            web_type_list.append(info.web_type.strip(' '))
+
+    for web_type in web_type_list:
+        if web_type == '报送数据前十名':
+            web_type = ' 报送数据前十名'
+        web_object = web_list.objects.filter(web_type=web_type)
+        data[web_type] = list(web_object.values())
+
+    # data['info'] = list(info.values())
 
     return JsonResponse(data)
 
