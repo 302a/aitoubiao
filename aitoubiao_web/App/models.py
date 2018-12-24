@@ -11,8 +11,6 @@ class industry_information(models.Model):
 
     class Meta:
         db_table = 'industry_information'
-        app_label = 'aitoubiao'
-
 
 class Announcement(models.Model):
     title = models.TextField()
@@ -21,8 +19,7 @@ class Announcement(models.Model):
     content = models.TextField()
 
     class Meta:
-        db_table = 'announcement'
-        app_label = 'aitoubiao'
+        db_table = 'Announcement'
 
 class User(models.Model):
     userid = models.CharField(max_length=16)
@@ -32,7 +29,6 @@ class User(models.Model):
 
     class Meta:
         db_table = 'user'
-        app_label = 'user'
 
 class analyse_of_market(models.Model):
         title = models.TextField()
@@ -42,10 +38,17 @@ class analyse_of_market(models.Model):
 
         class Meta:
             db_table = 'analyse_of_market'
-            app_label = 'aitoubiao'
 
+class web_list(models.Model):
+    web_name = models.TextField()
+    web_url = models.TextField()
+    web_type = models.CharField(max_length=32)
 
+    class Meta:
+        db_table = 'web_list'
 
+class test(models.Model):
+    web = models.TextField()
 
 
 

@@ -1,4 +1,5 @@
 import hashlib
+import json
 
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
@@ -6,8 +7,11 @@ from App.models import industry_information
 from App.models import Announcement
 from App.models import User
 from App.models import analyse_of_market
+from App.models import web_list
 
 # Create your views here.
+from django.views.decorators.csrf import csrf_exempt
+
 
 def home(request):
     # 获取session判断用户是否登录
@@ -82,8 +86,10 @@ def login(request):
 
     return JsonResponse(data)
 
+
 def unlogin(request):
     request.session.flush()
+
     data = {
         'status': '202',
         'msg': '用户已注销'
@@ -99,7 +105,8 @@ def home_model(request):
     }
     info = industry_information.objects.all()
     # data['news_info'] = info[0:12]
-    data['info'] = list(info.values())
+    data['info'] = list(info.values())[0:12]
+    # print(list(info.values))
 
     return JsonResponse(data)
 
@@ -125,6 +132,34 @@ def compile_userinfo(request):
         user.save()
 
     return JsonResponse(data)
+
+def test(request):
+    if request.method == 'GET':
+        print('*************')
+        print(request.GET.get('id'))
+        print('这是GET请求',request.body)
+        print(request.method)
+    elif request.method == 'POST':
+        print('*************')
+        username = request.POST.get('username')
+        users_vue = request.body
+        user_dict = users_vue.decode()
+        user_dict = json.loads(user_dict)
+        username = user_dict['username']
+        password = user_dict['password']
+        print('post数据',username)
+        print(password)
+
+    data = {
+        'status': '200',
+        'msg': 'ok',
+    }
+
+    return JsonResponse(data)
+
+
+
+
 
 
 
