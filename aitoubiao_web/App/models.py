@@ -22,8 +22,8 @@ class Announcement(models.Model):
         db_table = 'Announcement'
 
 class User(models.Model):
-    userid = models.CharField(max_length=16)
-    username = models.CharField(max_length=128)
+    username = models.CharField(max_length=16)
+    nickname = models.CharField(max_length=128)
     password = models.CharField(max_length=128)
     user_icon = models.ImageField(upload_to='icons')
 
@@ -43,6 +43,7 @@ class web_list(models.Model):
     web_name = models.TextField()
     web_url = models.TextField()
     web_type = models.CharField(max_length=32)
+    web_icon = models.ImageField(upload_to='web_icon')
 
     class Meta:
         db_table = 'web_list'
