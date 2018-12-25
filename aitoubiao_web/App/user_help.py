@@ -16,11 +16,11 @@ def help_login(username, password):
     elif len(results) == 1:
         result = results[0]
         if result[2] == password:
-            print(result[2])
+            # print(result[2])
             try:
                 # 执行sql语句
-                cursor_this.execute("insert into user(username, password, nickname, user_icon) values ('{}', '{}', '{}', '{}')"
-                                    .format(result[1], result[2], result[3], result[4]))
+                cursor_this.execute("insert into user(username, password, nickname) values ('{}', '{}', '{}')"
+                                    .format(result[1], result[2], result[3]))
                 # 提交到数据库执行
                 db_this.commit()
                 return '登录成功'

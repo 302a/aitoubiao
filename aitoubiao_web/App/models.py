@@ -51,7 +51,14 @@ class web_list(models.Model):
 class test(models.Model):
     web = models.TextField()
 
+class web_lists(models.Model):
+    web_name = models.TextField()
+    web_url = models.TextField()
+    web_type = models.CharField(max_length=32)
+    web_icon = models.ImageField(upload_to='web_icon',null=True)
 
+    class Meta:
+        db_table = 'web_lists'
 
 
 

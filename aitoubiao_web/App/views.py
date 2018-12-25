@@ -14,6 +14,8 @@ from App.models import test
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
 
+from App.user_help import help_login
+
 
 def home(request):
     # 获取session判断用户是否登录
@@ -61,30 +63,28 @@ def register(request):
     return JsonResponse(data)
 
 def login(request):
-    userid = request.POST.get('userid')
+    username = request.POST.get('username')
     data = {}
 
-    user = User.objects.filter(userid=userid)
+    user = User.objects.filter(username=username)
+    password = request.POST.get('password')
 
     if not user.exists():
-        data['status'] = '402'
-        data['msg'] = '用户不存在'
+        # 查总用户表
+        code = help_login(username, password)
+        if code == '没有此用户':
+            data['status'] = '404'
+            data['msg'] = '登录失败'
+        elif code == '登录成功':
+            data['status'] = '200'
+            data['msg'] = '登录成功'
 
     else:
         user = user.first()
+        data['status'] = '200'
+        data['msg'] = '登录成功'
 
-        password = request.POST.get('password')
-        # 判断密码是否正确
-        if password == secret_pwd(user.password):
-            data['status'] = '201'
-            data['msg'] = '登录成功'
-
-            # 设置session
-            request.session['userid'] = user.userid
-
-        else:
-            data['status'] = '403'
-            data['msg'] = '密码错误'
+        request.session['id'] = user.id
 
     return JsonResponse(data)
 
@@ -182,6 +182,7 @@ def web_name(request):
     # data['info'] = list(info.values())
 
     return JsonResponse(data)
+
 
 
 
