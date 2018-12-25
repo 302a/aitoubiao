@@ -136,29 +136,28 @@ def compile_userinfo(request):
 
     return JsonResponse(data)
 
+# 保存web网站链接信息
 def tests(request):
-    if request.method == 'GET':
-        print('*************')
-        print(request.GET.get('id'))
-        print('这是GET请求',request.body)
-        print(request.method)
-    elif request.method == 'POST':
-        print('*************')
-        username = request.POST.get('username')
-        users_vue = request.body
-        user_dict = users_vue.decode()
-        user_dict = json.loads(user_dict)
-        username = user_dict['username']
-        password = user_dict['password']
-        print('post数据',username)
-        print(password)
+    if request.method == "GET":
+        return render(request, "web_img_info.html")
+    elif request.method == "POST":
 
-    data = {
-        'status': '200',
-        'msg': 'ok',
-    }
+        web_name = request.POST.get("web_name")
+        web_url = request.POST.get("web_url")
+        web_type = request.POST.get("web_type")
+        icon = request.FILES.get("icon")
+        web = web_lists()
+        web.web_name = web_name
+        web.web_url = web_url
+        web.web_type = web_type
+        web.web_icon = icon
+        web.save()
 
-    return JsonResponse(data)
+        return render(request, "web_img_info.html")
+
+
+def save_img(request):
+    return render(request,'web_img_info.html')
 
 def web_name(request):
     data = {
