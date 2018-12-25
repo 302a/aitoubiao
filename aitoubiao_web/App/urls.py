@@ -25,5 +25,9 @@ urlpatterns = [
     url(r'^compile_userinfo/', views.compile_userinfo),
     url(r'^tests/', views.tests),
     url(r'^web_name/', views.web_name),
+    url(r'^send_announce/', views.send_announce),
+    url(r'^send_industry/', views.send_industry),
+    url(r'^send_analyse/', views.send_analyse),
+    url(r'^web_home/', views.web_home),
 
 ]
