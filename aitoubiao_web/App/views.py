@@ -290,8 +290,20 @@ def web_home(request):
 
     return JsonResponse(data)
 
+def save_icon(request):
+    icon = request.FILES.get('icon')
+    print(icon)
+    user = User()
+    user.username = '11'
+    user.password = '123456'
+    user.user_icon = icon
 
+    user.save()
 
+    return HttpResponse('保存成功')
+
+def test_img(request):
+    return render(request,'img_test.html')
 
 
 

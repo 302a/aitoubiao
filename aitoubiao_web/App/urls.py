@@ -29,5 +29,6 @@ urlpatterns = [
     url(r'^send_industry/', views.send_industry),
     url(r'^send_analyse/', views.send_analyse),
     url(r'^web_home/', views.web_home),
-
+    url(r'^save_icon/', views.save_icon,name='save_icon'),
+    url(r'^test_img/', views.test_img),
 ]

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <form action="{% url 'web:save_icon' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="exampleInputFile">头像</label>
+            <input type="file" name="icon" id="exampleInputFile">
+        </div>
+        <div class="submit">
+            <button type="submit" class="btn btn-primary">注册</button>
+        </div>
+    </form>
+</body>
+</html>
