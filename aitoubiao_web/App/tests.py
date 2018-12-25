@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from App.user_login import *
+from App.user_help import *
 
 print(test())
 
