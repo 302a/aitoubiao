@@ -305,7 +305,18 @@ def save_icon(request):
 def test_img(request):
     return render(request,'img_test.html')
 
+def home_each(request):
+    data = {
+        'status': '200',
+        'msg': 'ok'
+    }
 
+    id  = request.GET.get('id')
+    info = industry_information.objects.filter(pk=id)
+
+    data['info'] = info.values()
+
+    return JsonResponse(data)
 
 
 

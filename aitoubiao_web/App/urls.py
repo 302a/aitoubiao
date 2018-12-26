@@ -13,9 +13,13 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
+import django
 from django.conf import settings
 from django.conf.urls import url
 from django.conf.urls.static import static
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+
+from django.contrib import staticfiles
 
 from App import views
 
@@ -34,6 +38,6 @@ urlpatterns = [
     url(r'^web_home/', views.web_home),
     url(r'^save_icon/', views.save_icon,name='save_icon'),
     url(r'^test_img/', views.test_img),
-]
+    url(r'^home_each/', views.home_each),
 
-urlpatterns += static('/static/uploadfiles', document_root=settings.MEDIA_ROOT)
+]
