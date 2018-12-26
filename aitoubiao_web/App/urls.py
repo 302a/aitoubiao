@@ -39,5 +39,8 @@ urlpatterns = [
     url(r'^save_icon/', views.save_icon,name='save_icon'),
     url(r'^test_img/', views.test_img),
     url(r'^home_each/', views.home_each),
+    url(r'^get_announce/', views.get_announce),
+    url(r'^get_industry/', views.get_industry),
+    url(r'^get_analyse/', views.get_analyse),
 
 ]

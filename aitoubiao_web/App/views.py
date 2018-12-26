@@ -292,7 +292,11 @@ def web_home(request):
 
 def save_icon(request):
     icon = request.FILES.get('icon')
-    print(icon)
+    # a = str(icon)
+    # print(icon,type(icon))
+    a = User.objects.get(pk=8)
+    print(str(a.user_icon),type(str(a.user_icon)))
+
     user = User()
     user.username = '11'
     user.password = '123456'
@@ -314,13 +318,45 @@ def home_each(request):
     id  = request.GET.get('id')
     info = industry_information.objects.filter(pk=id)
 
-    data['info'] = info.values()
-
+    data['info'] = list(info.values())
     return JsonResponse(data)
 
+# 热点头条详情页
+def get_announce(request):
+    data = {
+        'status': '200',
+        'msg': 'ok'
+    }
 
+    id = request.GET.get('id')
+    info = Announcement.objects.filter(pk=id)
 
+    data['info'] = list(info.values)
+    return JsonResponse(data)
 
+def get_industry(request):
+    data = {
+        'status': '200',
+        'msg': 'ok'
+    }
+
+    id = request.GET.get('id')
+    info = industry_information.objects.filter(pk=id)
+
+    data['info'] = list(info.values)
+    return JsonResponse(data)
+
+def get_analyse(request):
+    data = {
+        'status': '200',
+        'msg': 'ok'
+    }
+
+    id = request.GET.get('id')
+    info = analyse_of_market.objects.filter(pk=id)
+
+    data['info'] = list(info.values)
+    return JsonResponse(data)
 
 
 
