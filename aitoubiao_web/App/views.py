@@ -329,9 +329,10 @@ def get_announce(request):
     }
 
     id = request.GET.get('id')
+
     info = Announcement.objects.filter(pk=id)
 
-    data['info'] = list(info.values)
+    data['info'] = list(info.values())
     return JsonResponse(data)
 
 def get_industry(request):
@@ -343,7 +344,7 @@ def get_industry(request):
     id = request.GET.get('id')
     info = industry_information.objects.filter(pk=id)
 
-    data['info'] = list(info.values)
+    data['info'] = list(info.values())
     return JsonResponse(data)
 
 def get_analyse(request):
@@ -355,7 +356,7 @@ def get_analyse(request):
     id = request.GET.get('id')
     info = analyse_of_market.objects.filter(pk=id)
 
-    data['info'] = list(info.values)
+    data['info'] = list(info.values())
     return JsonResponse(data)
 
 
