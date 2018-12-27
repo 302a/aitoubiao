@@ -1,9 +1,13 @@
 import hashlib
 import json
+import random
 import time
+import uuid
 
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
+
+# from App.dysms_python阿里云.demo_sms_send import send_sms
 from App.models import industry_information, web_lists
 from App.models import Announcement
 from App.models import User
@@ -18,6 +22,9 @@ from django.views.decorators.csrf import csrf_exempt
 from App.user_help import *
 
 # 判断用户是否登录
+from App.dysms_python阿里云.demo_sms_send import send_sms
+
+
 def home(request):
     # 获取session判断用户是否登录
     id = request.session.get('id')
@@ -40,12 +47,55 @@ def secret_pwd(password):
     password = hashlib.md5(password.decode('utf-8')).hexdigest()
     return password
 
-def register(request):
-    userid = request.POST.get('userid')
-    data = {}
+def send_message(request):
+    phone_number = request.GET.get('phone_number')
+    data = {
+        'status': '200',
+    }
     # 设置默认昵称
+    code1 = str(random.randint(0,9))
+    code2 = str(random.randint(0,9))
+    code3 = str(random.randint(0, 9))
+    code4 = str(random.randint(0, 9))
+    code = code1 + code2 + code3 + code4
+    params = {"code": code}
+
+    request.session['code'] = code
+    __business_id = uuid.uuid1()
+    send_info = send_sms(__business_id, phone_number, "孜晗科技", "SMS_153885416", params)
 
     return JsonResponse(data)
+
+def register(request):
+    code = request.session.get('code')
+    user_code = request.GET.get('code')
+    phone_number = request.GET.get('phone_number')
+    password = request.GET.get('password')
+    nickname = '默认用户'
+    data = {}
+
+    result = help_register(phone_number,nickname,secret_pwd(password))
+    if result == '注册成功':
+        if code == user_code:
+            # 验证码正确
+            user = User()
+            user.password = secret_pwd(password)
+            user.username = phone_number
+
+            user.save()
+
+            # 获取用户id，并设置session
+            users = User.objects.get(username=phone_number)
+            request.session['id'] = users.id
+
+            data['status'] = '200'
+            data['msg'] = 'ok'
+            return JsonResponse(data)
+
+    elif result == '用户名已存在':
+        data['status'] = '301'
+        data['msg'] = '用户名已存在'
+        return JsonResponse(data)
 
 def login(request):
     username = request.POST.get('username')
@@ -127,8 +177,13 @@ def compile_userinfo(request):
     user = User.objects.filter(pk=id)
     if user.exists():
         username = user.username
-        #修改总用户表
-        help_compile(username, password, nickname, user_icon)
+        # 修改总用户表
+        if nickname != None:
+            help_compile_nkn(username,nickname)
+        if password != None:
+            help_compile_pwd(username, password)
+        if user_icon != None:
+            help_compile_uic(username,user_icon)
         user = user.first()
         user.nickname = nickname
         # 密码加密

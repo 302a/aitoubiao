@@ -43,5 +43,6 @@ urlpatterns = [
     url(r'^get_industry/', views.get_industry),
     url(r'^get_analyse/', views.get_analyse),
     url(r'^web_guide/', views.web_guide),
+    url(r'^send_message/', views.send_message),
 
 ]
