@@ -15,7 +15,7 @@ from App.models import test
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
 
-from App.user_help import help_login
+from App.user_help import *
 
 # 判断用户是否登录
 def home(request):
@@ -126,6 +126,9 @@ def compile_userinfo(request):
 
     user = User.objects.filter(pk=id)
     if user.exists():
+        username = user.username
+        #修改总用户表
+        help_compile(username, password, nickname, user_icon)
         user = user.first()
         user.nickname = nickname
         # 密码加密
