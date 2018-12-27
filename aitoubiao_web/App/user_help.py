@@ -38,7 +38,7 @@ def help_login(username, password):
     db_this.close()
 
 
-def help_register(username, nickname, password, user_icon):
+def help_register(username, nickname, password):
     db_all = pymysql.connect("192.168.101.14", "root", "shaoyang", "user")
     db_this = pymysql.connect("192.168.101.14", "root", "shaoyang", "aitoubiao")
 
@@ -54,10 +54,10 @@ def help_register(username, nickname, password, user_icon):
     else:
         try:
             # 执行sql语句
-            cursor_all.execute("insert into user(username, password, nickname, user_icon) values ('{}', '{}', '{}', '{}')"
-                                    .format(username, password, nickname, user_icon))
-            cursor_this.execute("insert into user(username, password, nickname, user_icon) values ('{}', '{}', '{}', '{}')"
-                                    .format(username, password, nickname, user_icon))
+            cursor_all.execute("insert into user(username, password, nickname) values ('{}', '{}', '{}')"
+                                    .format(username, password, nickname))
+            cursor_this.execute("insert into user(username, password, nickname) values ('{}', '{}', '{}')"
+                                    .format(username, password, nickname))
             # 提交到数据库执行
             db_all.commit()
             db_this.commit()
@@ -141,5 +141,5 @@ def help_compile_uic(username, user_icon):
 
 
 if __name__ == '__main__':
-    pass
+    print(help_register('asd', 'asg', 'gagdf', None))
 
