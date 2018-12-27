@@ -70,12 +70,10 @@ def help_register(username, nickname, password, user_icon):
     db_all.close()
     db_this.close()
 
-def help_compile(username, password, nickname, user_icon):
+def help_compile_pwd(username, password):
     db_all = pymysql.connect("192.168.101.14", "root", "shaoyang", "user")
-    db_this = pymysql.connect("192.168.101.14", "root", "shaoyang", "aitoubiao")
 
     cursor_all = db_all.cursor()
-    cursor_this = db_this.cursor()
 
     cursor_all.execute("select * from user where username = '{}'".format(username))
 
@@ -83,8 +81,52 @@ def help_compile(username, password, nickname, user_icon):
 
     if len(results) == 1:
         try:
-            cursor_all.execute("update user set password='{}', nickname='{}', user_icon='{}' where username='{}'"
-                               .format(password, nickname, user_icon, username))
+            cursor_all.execute("update user set password='{}' where username='{}'"
+                               .format(password, username))
+            db_all.commit()
+            return '修改成功'
+        except:
+            db_all.rollback()
+            return '未知错误'
+    else:
+        return '未知错误'
+
+
+def help_compile_nkn(username, nickname):
+    db_all = pymysql.connect("192.168.101.14", "root", "shaoyang", "user")
+
+    cursor_all = db_all.cursor()
+
+    cursor_all.execute("select * from user where username = '{}'".format(username))
+
+    results = cursor_all.fetchall()
+
+    if len(results) == 1:
+        try:
+            cursor_all.execute("update user set nickname='{}' where username='{}'"
+                               .format(nickname, username))
+            db_all.commit()
+            return '修改成功'
+        except:
+            db_all.rollback()
+            return '未知错误'
+    else:
+        return '未知错误'
+
+
+def help_compile_uic(username, user_icon):
+    db_all = pymysql.connect("192.168.101.14", "root", "shaoyang", "user")
+
+    cursor_all = db_all.cursor()
+
+    cursor_all.execute("select * from user where username = '{}'".format(username))
+
+    results = cursor_all.fetchall()
+
+    if len(results) == 1:
+        try:
+            cursor_all.execute("update user set user_icon='{}' where username='{}'"
+                               .format(user_icon, username))
             db_all.commit()
             return '修改成功'
         except:
@@ -99,5 +141,5 @@ def help_compile(username, password, nickname, user_icon):
 
 
 if __name__ == '__main__':
-    print(help_compile('a', '111', 'aaaa', 'icontest'))
+    pass
 
