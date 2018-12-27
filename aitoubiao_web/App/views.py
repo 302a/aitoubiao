@@ -17,7 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from App.user_help import help_login
 
-
+# 判断用户是否登录
 def home(request):
     # 获取session判断用户是否登录
     id = request.session.get('id')
@@ -44,7 +44,6 @@ def register(request):
     userid = request.POST.get('userid')
     data = {}
     # 设置默认昵称
-
 
     return JsonResponse(data)
 
