@@ -394,5 +394,3 @@ def get_analyse(request):
 
 
 
-
-
