@@ -66,6 +66,7 @@ def help_register(username, nickname, password):
             # 如果发生错误则回滚
             db_all.rollback()
             db_this.rollback()
+            return '异常'
 
     db_all.close()
     db_this.close()
@@ -141,5 +142,5 @@ def help_compile_uic(username, user_icon):
 
 
 if __name__ == '__main__':
-    print(help_register('asd', 'asg', 'gagdf', None))
+    print(help_register('18738661138', '默认用户', 'e10adc3949ba59abbe56e057f20f883e'))
 

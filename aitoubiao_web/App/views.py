@@ -44,11 +44,14 @@ def home(request):
 
 
 def secret_pwd(password):
-    password = hashlib.md5(password.decode('utf-8')).hexdigest()
+    password = hashlib.md5(password.encode('utf-8')).hexdigest()
+    print('加密中', password)
     return password
 
+mycode = ''
 def send_message(request):
     phone_number = request.GET.get('phone_number')
+    # print('手机号为',phone_number)
     data = {
         'status': '200',
     }
@@ -57,33 +60,38 @@ def send_message(request):
     code2 = str(random.randint(0,9))
     code3 = str(random.randint(0, 9))
     code4 = str(random.randint(0, 9))
-    code = code1 + code2 + code3 + code4
-    params = {"code": code}
+    lastcode = code1 + code2 + code3 + code4
+    params = {"code": lastcode}
+    # print('设置的code',lastcode)
+    global mycode
+    mycode = lastcode
 
-    request.session['code'] = code
+    # request.session.flush()
+    # request.session['my_code'] = lastcode
+    # print('设置的session',lastcode)
+    # print(request.session.get('my_code'))
     __business_id = uuid.uuid1()
     send_info = send_sms(__business_id, phone_number, "孜晗科技", "SMS_153885416", params)
 
     return JsonResponse(data)
 
 def register(request):
-    code = request.session.get('code')
-    user_code = request.GET.get('code')
-    phone_number = request.GET.get('phone_number')
-    password = request.GET.get('password')
+    # lastcode = request.session.get('my_code')
+    lastcode = mycode
+    user_code = request.POST.get('code')
+    phone_number = request.POST.get('phone_number')
+    password = request.POST.get('password')
+
     nickname = '默认用户'
+
     data = {}
+    password = secret_pwd(password)
+    print(type(password), password)
 
-    result = help_register(phone_number,nickname,secret_pwd(password))
-    if result == '注册成功':
-        if code == user_code:
-            # 验证码正确
-            user = User()
-            user.password = secret_pwd(password)
-            user.username = phone_number
-
-            user.save()
-
+    if lastcode == user_code:
+        result = help_register(phone_number, nickname, password)
+        print(result)
+        if result == '注册成功':
             # 获取用户id，并设置session
             users = User.objects.get(username=phone_number)
             request.session['id'] = users.id
@@ -92,10 +100,10 @@ def register(request):
             data['msg'] = 'ok'
             return JsonResponse(data)
 
-    elif result == '用户名已存在':
-        data['status'] = '301'
-        data['msg'] = '用户名已存在'
-        return JsonResponse(data)
+        elif result == '用户名已存在':
+            data['status'] = '301'
+            data['msg'] = '用户名已存在'
+            return JsonResponse(data)
 
 def login(request):
     username = request.POST.get('username')
