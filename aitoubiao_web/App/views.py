@@ -54,6 +54,7 @@ def login(request):
 
     user = User.objects.filter(username=username)
     password = request.POST.get('password')
+    password = secret_pwd(password)
 
     if not user.exists():
         # 查总用户表
@@ -167,6 +168,7 @@ def web_name(request):
         'status': '200',
         'msg': 'ok'
     }
+
 
     info_list = web_list.objects.all()
     web_type_list = []
@@ -362,7 +364,19 @@ def get_analyse(request):
     data['info'] = list(info.values())
     return JsonResponse(data)
 
+# 网址导航更多页面
+def web_guide(request):
+    data = {
+        'status': '200',
+        'msg': 'ok'
+    }
 
+    types = request.GET.get('type')
+
+    info_list = web_list.objects.filter(web_type=types)
+    data['info'] = list(info_list.values())
+
+    return JsonResponse(data)
 
 
 
