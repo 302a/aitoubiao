@@ -29,7 +29,9 @@ urlpatterns = [
     url(r'^login/', views.login),
     url(r'^unlogin/', views.unlogin),
     url(r'^home_model/', views.home_model),
-    url(r'^compile_userinfo/', views.compile_userinfo),
+    url(r'^change_nickname/', views.change_nickname),
+    url(r'^change_pwd/', views.change_pwd),
+    url(r'^change_usericon/', views.change_usericon),
     url(r'^tests/', views.tests,name='test'),
     url(r'^web_name/', views.web_name),
     url(r'^send_announce/', views.send_announce),
@@ -44,5 +46,6 @@ urlpatterns = [
     url(r'^get_analyse/', views.get_analyse),
     url(r'^web_guide/', views.web_guide),
     url(r'^send_message/', views.send_message),
+    url(r'^get_news_info/', views.get_news_info),
 
 ]

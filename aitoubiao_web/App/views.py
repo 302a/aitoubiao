@@ -48,7 +48,7 @@ def secret_pwd(password):
     print('加密中', password)
     return password
 
-mycode = ''
+# mycode = ''
 def send_message(request):
     phone_number = request.GET.get('phone_number')
     # print('手机号为',phone_number)
@@ -63,21 +63,19 @@ def send_message(request):
     lastcode = code1 + code2 + code3 + code4
     params = {"code": lastcode}
     # print('设置的code',lastcode)
-    global mycode
-    mycode = lastcode
 
-    # request.session.flush()
-    # request.session['my_code'] = lastcode
-    # print('设置的session',lastcode)
-    # print(request.session.get('my_code'))
+    request.session['my_code'] = lastcode
+    print('设置的session',lastcode)
+    print(request.session.get('my_code'))
     __business_id = uuid.uuid1()
     send_info = send_sms(__business_id, phone_number, "孜晗科技", "SMS_153885416", params)
 
     return JsonResponse(data)
 
 def register(request):
-    # lastcode = request.session.get('my_code')
-    lastcode = mycode
+    lastcode = request.session.get('my_code')
+    print('获得的session',lastcode)
+    # lastcode = mycode
     user_code = request.POST.get('code')
     phone_number = request.POST.get('phone_number')
     password = request.POST.get('password')
@@ -172,11 +170,8 @@ def home_model(request):
     return JsonResponse(data)
 
 # 编辑用户信息
-def compile_userinfo(request):
+def change_nickname(request):
     nickname = request.POST.get('nickname')
-    password = request.POST.get('password')
-    user_icon = request.FILES['user_icon']
-
     data = {}
 
     # 获取当前用户
@@ -185,20 +180,68 @@ def compile_userinfo(request):
     user = User.objects.filter(pk=id)
     if user.exists():
         username = user.username
+        user = user.first()
         # 修改总用户表
         if nickname != None:
-            help_compile_nkn(username,nickname)
-        if password != None:
-            help_compile_pwd(username, password)
-        if user_icon != None:
-            help_compile_uic(username,user_icon)
-        user = user.first()
-        user.nickname = nickname
-        # 密码加密
-        user.password = secret_pwd(password)
-        user.user_icon = user_icon
+            result = help_compile_nkn(username,nickname)
+            if result == '修改成功':
+                user.nickname = nickname
+                data['status'] = '200'
+                data['msg'] = '用户信息修改成功'
+                user.save()
+            else:
+                data['status'] = '301'
+                data['msg'] = '发生未知错误,用户信息修改失败'
 
-        user.save()
+    return JsonResponse(data)
+
+def change_pwd(request):
+    password = request.POST.get('password')
+    data = {}
+
+    # 获取当前用户
+    id = request.session.get('id')
+
+    user = User.objects.filter(pk=id)
+    if user.exists():
+        username = user.username
+        user = user.first()
+        if password != None:
+            result = help_compile_pwd(username, password)
+            if result == '修改成功':
+                # 密码加密
+                user.password = secret_pwd(password)
+                user.save()
+                data['status'] = '200'
+                data['msg'] = '用户信息修改成功'
+            else:
+                data['status'] = '301'
+                data['msg'] = '发生未知错误,用户信息修改失败'
+
+    return JsonResponse(data)
+
+def change_usericon(request):
+    user_icon = request.FILES['user_icon']
+    data = {}
+
+    # 获取当前用户
+    id = request.session.get('id')
+
+    user = User.objects.filter(pk=id)
+    if user.exists():
+        username = user.username
+        user = user.first()
+
+        if user_icon != None:
+            result = help_compile_uic(username,user_icon)
+            if result == '修改成功':
+                user.user_icon = user_icon
+                user.save()
+                data['status'] = '200'
+                data['msg'] = '用户信息修改成功'
+            else:
+                data['status'] = '301'
+                data['msg'] = '发生未知错误,用户信息修改失败'
 
     return JsonResponse(data)
 
@@ -249,11 +292,11 @@ def web_name(request):
     return JsonResponse(data)
 
 # 对时间进行处理
-def operate_date(data_list):
+def operate_date(data_list,page,count):
     data_set_return = {}
     data_list_return = []
     timeStamp_list = []
-    count = 1
+    counts = 1
 
     # 根据时间进行排序
     for i in data_list:
@@ -268,8 +311,8 @@ def operate_date(data_list):
 
         if timeStamp in data_set_return:
             # print('时间戳重复',timeStamp)
-            timeStamp += count
-            count += 1
+            timeStamp += counts
+            counts += 1
 
         # print('修改后的时间戳',timeStamp)
         data_set_return[timeStamp] = i
@@ -280,20 +323,35 @@ def operate_date(data_list):
 
     # 将排好序的对象保存并返回
     # print('来到了这里')
-    for j in timeStamp_list:
-        data_list_return.append(data_set_return[j])
+    if page != None:
+        start_num = (int(page)-1) * int(count)
+        end_num = (int(page)-1) * int(count) + int(count)
+        # print('开始个数',start_num)
+        # print('结束个数',end_num)
 
+        if end_num <= len(timeStamp_list):
+            for j in range(start_num,end_num):
+                data_list_return.append(data_set_return[timeStamp_list[j]])
+            # print('数据长度为',len(data_list_return))
+        elif start_num <= len(timeStamp_list) and end_num > len(timeStamp_list):
+
+            for j in range(start_num,len(timeStamp_list)):
+                data_list_return.append(data_set_return[timeStamp_list[j]])
+            # print('数据长度为：',len(data_list_return))
+
+    else:
+        for j in timeStamp_list:
+            data_list_return.append(data_set_return[j])
     return data_list_return
 
 # 获取数据库信息
-def get_data(data_list,count):
+def get_data(data_list,count,page):
     if count == None:
-        data_list_return = operate_date(data_list)
+        data_list_return = operate_date(data_list,page,count)
         return data_list_return
-
     else:
         # print('进入了这里')
-        data_list_return = operate_date(data_list)
+        data_list_return = operate_date(data_list,page,count)
         # print('切片后的值为：：：',data_list_return,type(data_list_return),count)
         return data_list_return[0:int(count)]
 
@@ -301,12 +359,14 @@ def get_data(data_list,count):
 def send_announce(request):
     # print('进入此页面')
     count = request.GET.get('count')
+    page  =request.GET.get('page')
+
     # print(count)
     data_list = Announcement.objects.all()
     data_list = list(data_list.values())
     data = {}
 
-    announce = get_data(data_list, count)
+    announce = get_data(data_list,count,page)
     # print(industry)
     data['info'] = announce
     return JsonResponse(data)
@@ -315,6 +375,7 @@ def send_announce(request):
 # 行业资讯
 def send_industry(request):
     count = request.GET.get('count')
+    page = request.GET.get('page')
     data_list = industry_information.objects.all()
     data_list = list(data_list.values())
     data = {}
@@ -322,7 +383,7 @@ def send_industry(request):
     #     date = data_list[0]['date'] + ' 00:00:00'
     # print('日期信息为::::',date)
 
-    industry = get_data(data_list,count)
+    industry = get_data(data_list,count,page)
     # print(industry)
     data['info'] = industry
     return JsonResponse(data)
@@ -330,11 +391,12 @@ def send_industry(request):
 # 行业分析
 def send_analyse(request):
     count = request.GET.get('count')
+    page = request.GET.get('page')
     data_list = analyse_of_market.objects.all()
     data_list = list(data_list.values())
     data = {}
 
-    analyse = get_data(data_list, count)
+    analyse = get_data(data_list, count,page)
     # print(industry)
     data['info'] = analyse
     return JsonResponse(data)
@@ -440,8 +502,29 @@ def web_guide(request):
 
     return JsonResponse(data)
 
+# 热点头条更多详情页
+def get_news_info(request):
+    types = request.GET.get('type')
+    id = request.GET.get('id')
+    data = {}
 
+    if types == '通知公告':
+        info = Announcement.objects.filter(pk=id)
 
+        data['info'] = list(info.values())
+        return JsonResponse(data)
+
+    if types == '行业资讯':
+        info = industry_information.objects.filter(pk=id)
+
+        data['info'] = list(info.values())
+        return JsonResponse(data)
+
+    if types == '行业简报':
+        info = analyse_of_market.objects.filter(pk=id)
+
+        data['info'] = list(info.values())
+        return JsonResponse(data)
 
 
 
