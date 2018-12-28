@@ -15,6 +15,8 @@ from App.models import analyse_of_market
 from App.models import web_list
 from App.models import test
 
+import redis
+
 
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
@@ -28,13 +30,14 @@ from App.dysms_python阿里云.demo_sms_send import send_sms
 def home(request):
     # 获取session判断用户是否登录
     id = request.session.get('id')
+    print('session',id)
     data = {}
 
     user = User.objects.filter(pk=id)
     if user.exists():
         data['status'] = '203'
         data['msg'] = '用户已登录'
-        data['person'] = user
+        data['person'] = list(user.values())
 
     else:
         data['status'] = '300'
@@ -47,6 +50,12 @@ def secret_pwd(password):
     password = hashlib.md5(password.encode('utf-8')).hexdigest()
     print('加密中', password)
     return password
+
+# 连接redis
+def conn_redis():
+    pool = redis.ConnectionPool(host='127.0.0.1', port=6379, db=0)
+    r = redis.StrictRedis(connection_pool=pool)
+    return r
 
 # mycode = ''
 def send_message(request):
@@ -63,32 +72,45 @@ def send_message(request):
     lastcode = code1 + code2 + code3 + code4
     params = {"code": lastcode}
     # print('设置的code',lastcode)
+    data['code'] = lastcode
 
-    request.session['my_code'] = lastcode
-    print('设置的session',lastcode)
-    print(request.session.get('my_code'))
+    # request.session['my_code'] = lastcode
+    r = conn_redis()
+    r.set('code',lastcode,ex=300)
+
+    # print('设置的session',lastcode)
     __business_id = uuid.uuid1()
     send_info = send_sms(__business_id, phone_number, "孜晗科技", "SMS_153885416", params)
 
     return JsonResponse(data)
 
 def register(request):
-    lastcode = request.session.get('my_code')
-    print('获得的session',lastcode)
+    # lastcode = request.session.get('my_code')
+    # print('获得的session',lastcode)
     # lastcode = mycode
-    user_code = request.POST.get('code')
-    phone_number = request.POST.get('phone_number')
-    password = request.POST.get('password')
+    r = conn_redis()
+    lastcode = r.get('code')
+    lastcode = str(lastcode, encoding='utf-8')
+
+    # print(lastcode,type(lastcode))
+
+    users_vue = request.body
+    user_dict = users_vue.decode()
+    user_dict = json.loads(user_dict)
+    phone_number = user_dict['phone_number']
+    user_code = user_dict['code']
+    password = user_dict['password']
+    # print(phone_number, user_code, password)
 
     nickname = '默认用户'
 
     data = {}
     password = secret_pwd(password)
-    print(type(password), password)
+    # print(type(password), password)
 
     if lastcode == user_code:
         result = help_register(phone_number, nickname, password)
-        print(result)
+        # print(result)
         if result == '注册成功':
             # 获取用户id，并设置session
             users = User.objects.get(username=phone_number)
@@ -96,27 +118,35 @@ def register(request):
 
             data['status'] = '200'
             data['msg'] = 'ok'
-            return JsonResponse(data)
 
         elif result == '用户名已存在':
             data['status'] = '301'
             data['msg'] = '用户名已存在'
-            return JsonResponse(data)
+
+    else:
+        data['status'] = '404'
+        data['msg'] = '验证码错误'
+
+    return JsonResponse(data)
 
 def login(request):
-    username = request.POST.get('username')
     data = {}
 
-    user = User.objects.filter(username=username)
-    password = request.POST.get('password')
+    users_vue = request.body
+    user_dict = users_vue.decode()
+    user_dict = json.loads(user_dict)
+    phone_number = user_dict['phone_number']
+    password = user_dict['password']
+
+    user = User.objects.filter(username=phone_number)
     password = secret_pwd(password)
 
     if not user.exists():
         # 查总用户表
-        code = help_login(username, password)
+        code = help_login(phone_number, password)
 
         if code == '登录成功':
-            user = User.objects.filter(username=username)
+            user = User.objects.filter(username=phone_number)
 
             if user.exists():
                 user = user.first()
@@ -133,8 +163,12 @@ def login(request):
 
     else:
         user = user.first()
-        data['status'] = '200'
-        data['msg'] = '登录成功'
+        if user.password == password:
+            data['status'] = '200'
+            data['msg'] = '登录成功'
+        else:
+            data['status'] = '404'
+            data['msg'] = '账号或密码错误'
 
         request.session['id'] = user.id
 
@@ -356,50 +390,35 @@ def get_data(data_list,count,page):
         return data_list_return[0:int(count)]
 
 # 行业公告
-def send_announce(request):
+def send_industry_info(request):
     # print('进入此页面')
     count = request.GET.get('count')
-    page  =request.GET.get('page')
+    page  = request.GET.get('page')
+    types = request.GET.get('type')
 
     # print(count)
-    data_list = Announcement.objects.all()
+    if types == '通知公告':
+        data_list = Announcement.objects.all()
+
+    if types == '行业资讯':
+        data_list = industry_information.objects.all()
+
+    if types == '行业简报':
+        data_list = analyse_of_market.objects.all()
+
     data_list = list(data_list.values())
     data = {}
 
-    announce = get_data(data_list,count,page)
+    info = get_data(data_list,count,page)
     # print(industry)
-    data['info'] = announce
+    data['info'] = info
     return JsonResponse(data)
 
 
 # 行业资讯
-def send_industry(request):
-    count = request.GET.get('count')
-    page = request.GET.get('page')
-    data_list = industry_information.objects.all()
-    data_list = list(data_list.values())
-    data = {}
-    # if len(data_list[0]['date']) < 12:
-    #     date = data_list[0]['date'] + ' 00:00:00'
-    # print('日期信息为::::',date)
-
-    industry = get_data(data_list,count,page)
-    # print(industry)
-    data['info'] = industry
-    return JsonResponse(data)
 
 # 行业分析
-def send_analyse(request):
-    count = request.GET.get('count')
-    page = request.GET.get('page')
-    data_list = analyse_of_market.objects.all()
-    data_list = list(data_list.values())
-    data = {}
 
-    analyse = get_data(data_list, count,page)
-    # print(industry)
-    data['info'] = analyse
-    return JsonResponse(data)
 
 def web_home(request):
     data = {
@@ -493,6 +512,7 @@ def web_guide(request):
     data = {
         'status': '200',
         'msg': 'ok'
+
     }
 
     types = request.GET.get('type')
@@ -507,24 +527,98 @@ def get_news_info(request):
     types = request.GET.get('type')
     id = request.GET.get('id')
     data = {}
+    # print(types,type(types))
 
     if types == '通知公告':
         info = Announcement.objects.filter(pk=id)
 
         data['info'] = list(info.values())
-        return JsonResponse(data)
 
     if types == '行业资讯':
         info = industry_information.objects.filter(pk=id)
 
         data['info'] = list(info.values())
-        return JsonResponse(data)
 
     if types == '行业简报':
         info = analyse_of_market.objects.filter(pk=id)
 
         data['info'] = list(info.values())
-        return JsonResponse(data)
+
+    return JsonResponse(data)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

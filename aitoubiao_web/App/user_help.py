@@ -15,6 +15,7 @@ def help_login(username, password):
         return '没有此用户'
     elif len(results) == 1:
         result = results[0]
+
         if result[2] == password:
             # print(result[2])
             try:
