@@ -30,7 +30,7 @@ from App.dysms_python阿里云.demo_sms_send import send_sms
 def home(request):
     # 获取session判断用户是否登录
     id = request.session.get('id')
-    print('session',id)
+    # print('session',id)
     data = {}
 
     user = User.objects.filter(pk=id)
@@ -182,6 +182,7 @@ def unlogin(request):
         'status': '202',
         'msg': '用户已注销'
     }
+    print(request.session.get('id'))
 
     return JsonResponse(data)
 
@@ -205,7 +206,11 @@ def home_model(request):
 
 # 编辑用户信息
 def change_nickname(request):
-    nickname = request.POST.get('nickname')
+    users_vue = request.body
+    user_dict = users_vue.decode()
+    user_dict = json.loads(user_dict)
+    nickname = user_dict['nickname']
+
     data = {}
 
     # 获取当前用户
@@ -213,8 +218,8 @@ def change_nickname(request):
 
     user = User.objects.filter(pk=id)
     if user.exists():
-        username = user.username
         user = user.first()
+        username = user.username
         # 修改总用户表
         if nickname != None:
             result = help_compile_nkn(username,nickname)
@@ -230,7 +235,11 @@ def change_nickname(request):
     return JsonResponse(data)
 
 def change_pwd(request):
-    password = request.POST.get('password')
+    users_vue = request.body
+    user_dict = users_vue.decode()
+    user_dict = json.loads(user_dict)
+    password = user_dict['password']
+
     data = {}
 
     # 获取当前用户
@@ -238,8 +247,8 @@ def change_pwd(request):
 
     user = User.objects.filter(pk=id)
     if user.exists():
-        username = user.username
         user = user.first()
+        username = user.username
         if password != None:
             result = help_compile_pwd(username, password)
             if result == '修改成功':
@@ -255,7 +264,11 @@ def change_pwd(request):
     return JsonResponse(data)
 
 def change_usericon(request):
-    user_icon = request.FILES['user_icon']
+    users_vue = request.body
+    user_dict = users_vue.decode()
+    user_dict = json.loads(user_dict)
+    user_icon = user_dict['usericon']
+
     data = {}
 
     # 获取当前用户
@@ -263,8 +276,9 @@ def change_usericon(request):
 
     user = User.objects.filter(pk=id)
     if user.exists():
-        username = user.username
         user = user.first()
+        username = user.username
+
 
         if user_icon != None:
             result = help_compile_uic(username,user_icon)
