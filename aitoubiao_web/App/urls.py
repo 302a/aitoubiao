@@ -45,5 +45,6 @@ urlpatterns = [
     url(r'^web_guide/', views.web_guide),
     url(r'^send_message/', views.send_message),
     url(r'^get_news_info/', views.get_news_info),
+    url(r'^find_pwd/', views.find_pwd),
 
 ]

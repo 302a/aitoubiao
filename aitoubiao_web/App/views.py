@@ -48,7 +48,7 @@ def home(request):
 
 def secret_pwd(password):
     password = hashlib.md5(password.encode('utf-8')).hexdigest()
-    print('加密中', password)
+    # print('加密中', password)
     return password
 
 # 连接redis
@@ -81,6 +81,41 @@ def send_message(request):
     # print('设置的session',lastcode)
     __business_id = uuid.uuid1()
     send_info = send_sms(__business_id, phone_number, "孜晗科技", "SMS_153885416", params)
+
+    return JsonResponse(data)
+
+# 找回密码
+def find_pwd(request):
+    r = conn_redis()
+    lastcode = r.get('code')
+    lastcode = str(lastcode, encoding='utf-8')
+    data = {}
+
+    # print(lastcode,type(lastcode))
+    users_vue = request.body
+    user_dict = users_vue.decode()
+    user_dict = json.loads(user_dict)
+    phone_number = user_dict['phone_number']
+    user_code = user_dict['code']
+    password = user_dict['password']
+    password = secret_pwd(password)
+    print(phone_number, password)
+
+    if lastcode == user_code:
+        result = help_compile_pwd(phone_number,password)
+        # print('result',result)
+        if result == '修改成功':
+            user = User.objects.filter(username=phone_number)
+            user = user.first()
+            user.password = password
+
+            user.save()
+            data['status'] = '200'
+            data['msg'] = '密码修改成功'
+
+        else:
+            data['status'] = '403'
+            data['msg'] = '数据库内部错误'
 
     return JsonResponse(data)
 

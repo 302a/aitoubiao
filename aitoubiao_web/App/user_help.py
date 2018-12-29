@@ -140,5 +140,5 @@ def help_compile_uic(username, user_icon):
 
 
 if __name__ == '__main__':
-    print(help_register('18738661138', '默认用户', 'e10adc3949ba59abbe56e057f20f883e'))
-
+    # print(help_compile_pwd(''))
+    pass
